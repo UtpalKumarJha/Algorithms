@@ -1,6 +1,6 @@
 #include<bits/stdc++.h>
 using namespace std;
-const int mod = 1000000009;
+const int mod = 1000000007;
 typedef long long ll;
 
 ll calc(ll base,ll power)
