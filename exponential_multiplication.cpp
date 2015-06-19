@@ -21,6 +21,7 @@ ll calc(ll base,ll power)
 }
 int t;
 int base,power;
+
 int main()
 {
 	cin >> t;
