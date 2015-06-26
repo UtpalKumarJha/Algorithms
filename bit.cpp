@@ -4,11 +4,10 @@ using namespace std;
 
 int n,arr[maxi],tree[4*maxi];
 
-void update(int idx,int value)
+void update(int idx,int value,int first)
 {
 	while(idx<=maxi)
 	{
-	   //cout<<idx<<endl;
        tree[idx]+=value;
        idx+=((idx)&(-idx));
 	}
@@ -18,7 +17,7 @@ void construct()
 {
 	for(int i=1;i<=n;i++)
 	{
-		update(i,arr[i]);
+		update(i,arr[i],i);
 	}
 }
 
@@ -34,18 +33,19 @@ ll read(int idx)
 	}
 	return sum;
 }
+
 int a,b;
+
 int main()
 {
 	cin >> n;
+
 	for(int i=1;i<=n;i++)
 	{
 		cin >> arr[i];
 	}
     
-
     construct();
-
     int nq;
     cout<<"enter number of queries"<<endl;
     cin >> nq;
