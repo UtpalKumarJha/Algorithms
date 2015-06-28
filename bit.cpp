@@ -1,13 +1,17 @@
 #include<bits/stdc++.h>
+#define PB push_back
 #define maxi 101
 using namespace std;
 
 int n,arr[maxi],tree[4*maxi];
 
+vector<int> ans[maxi];
+
 void update(int idx,int value,int first)
 {
 	while(idx<=maxi)
 	{
+	   ans[idx].PB(first);
        tree[idx]+=value;
        idx+=((idx)&(-idx));
 	}
@@ -50,6 +54,7 @@ int main()
     cout<<"enter number of queries"<<endl;
     cin >> nq;
 
+   
 
     for(int i=0;i<nq;i++)
     {
