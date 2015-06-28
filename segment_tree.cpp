@@ -1,69 +1,68 @@
 #include<bits/stdc++.h>
+#define maxi 1000005
 using namespace std;
 
-int n,arr[1000];
-int tree[100000];
-int p,q,qq;
 
-int segment_min(int index,int start,int end)
+typedef long long ll;
+
+ll arr[maxi],tree[maxi];
+
+int n,x,y,q;
+
+ll segment(int index,int start,int end)
 {
 	if(start==end)
 	{
 		tree[index]=arr[start];
 		return tree[index];
 	}
-	
-	int mid = (start+end)/2;
-	
-	int g = segment_min(2*index+1,start,mid);
-	int h = segment_min(2*index+2,mid+1,end);
-	
-	tree[index]=min(g,h);
-	return tree[index];
-	
+
+    int mid = (start+end)/2;
+
+    tree[index]=segment(2*index+1,start,mid)+segment(2*index+2,mid+1,end);
+    return tree[index];
+
 }
 
-int mi(int index,int start,int end)
+ll query(int index,int start,int end)
 {
-	if(start>=p && end<=q)
-	{
-		return tree[index];
-	}
-	if(start>q || end <p)
-	{
-		return INT_MAX;
-	}
-	
-	int mid=(start+end)/2;
-	
-	return min(mi(2*index+1,start,mid),mi(2*index+2,mid+1,end));
-	
+   if(start>y || end<x)
+   {
+   	 return 0;
+   }
+
+   if(start>=x && end<=y)
+   {
+   	 return tree[index];
+   }
+
+   int mid = (start+end)/2;
+
+   int l = query(2*index+1,start,mid);
+   int m = query(2*index+2,mid+1,end);
+   
+   return l+m;
+
 }
 
 int main()
 {
 	cin >> n;
-	
 	for(int i=0;i<n;i++)
 	{
 		cin >> arr[i];
 	}
-	
-	segment_min(0,0,n-1);
-	
-	for(int i=0;i<2*n+5;i++)
-	{
-		cout <<tree[i]<< " ";
-	}
-	cout <<endl;
-	cout <<"ENTER NUMBER OF QUERIES"<<endl;
-	
-	cin >> qq;
-	while(qq--)
-	{
-		cin >> p >> q;
-		cout <<mi(0,0,n-1)<<endl;
-	}
-	
+
+    segment(0,0,n-1);
+
+   cout<<"Enter number of queries"<<endl;
+   cin >> q;
+
+   for(int i=0;i<q;i++)
+   {
+      cin >> x >>y;
+      cout<<query(0,0,n-1)<<endl;
+   }
+
 	return 0;
 }
