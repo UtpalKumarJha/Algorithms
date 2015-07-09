@@ -1,130 +1,123 @@
-#include<bits/stdc++.h>
-#define maxi 1000005
-using namespace std;
+#include <stdio.h>
+#include <math.h> 
 
-typedef long long ll;
+long long *segmentTree;
+long long *lazy;
 
-ll arr[maxi],tree[maxi],lazy[maxi];
-int n,y,x,q,value;
+long long query(int qLo, int qHi, int cLo, int cHi, int stIndex);
 
-ll build(int index,int start,int end)
+void update(int qLo, int qHi, int cLo, int cHi, int stIndex, long long val)
 {
-	if(start==end)
-	{
-		tree[index]=arr[start];
-		return tree[index];
-	}
+    if (cHi < qLo || qHi < cLo)
+        return;
 
-    int mid =(start+end)/2;
+    if (lazy[stIndex] != 0)
+    {
+        if (cLo == cHi)
+        {
+            segmentTree[stIndex] += lazy[stIndex];
+        }
+        else
+        {
+            segmentTree[stIndex] += lazy[stIndex]*(cHi - cLo + 1);
+            lazy[stIndex * 2 + 1] += lazy[stIndex];
+            lazy[stIndex * 2 + 2] += lazy[stIndex];
+        }
+        lazy[stIndex] = 0;
+    }
 
-    tree[index]=max(build(2*index+1,start,mid),build(2*index+2,mid+1,end));
-    return tree[index];
+    if (qLo <= cLo && cHi <= qHi)
+    {
+        if (cLo == cHi)
+        {
+            segmentTree[stIndex] += val;
+        }
+        else
+        {
+            segmentTree[stIndex] += val * (cHi - cLo + 1);
+            lazy[stIndex * 2 + 1] += val;
+            lazy[stIndex * 2 + 2] += val;
+        }
+        return;
+    }
+
+    int mid = (cLo + cHi) / 2;
+    update(qLo, qHi, cLo, mid, stIndex * 2 + 1, val);
+    update(qLo, qHi, mid + 1, cHi, stIndex * 2 + 2, val);
+    int left = stIndex * 2 + 1;
+    int right = left + 1;
+    segmentTree[stIndex] = query(cLo, mid, cLo, mid, stIndex * 2 + 1) + query(mid + 1, cHi, mid + 1, cHi, stIndex * 2 + 2);
 }
 
-
-ll query(int index,int start,int end)
+long long query(int qLo, int qHi, int cLo, int cHi, int stIndex)
 {
-	if(lazy[index]!=0)
+    if (cHi < qLo || qHi < cLo)return 0;
+
+    if (lazy[stIndex] != 0)
     {
-       tree[index]+=lazy[index];
+        if (cLo == cHi)
+        {
+            segmentTree[stIndex] += lazy[stIndex];
+        }
+        else
+        {
+            segmentTree[stIndex] += lazy[stIndex]*(cHi - cLo + 1);
+            lazy[stIndex * 2 + 1] += lazy[stIndex];
+            lazy[stIndex * 2 + 2] += lazy[stIndex];
+        }
 
-       if(start!=end)
-       {
-       	  lazy[2*index+2]+=lazy[index];
-       	  lazy[2*index+1]+=lazy[index];
-       }
-
-       lazy[index]=0;
+        lazy[stIndex] = 0;
     }
-    
-	if(start>y || end<x)
-	{
-		return INT_MIN;
-	}
+    if (qLo <= cLo && cHi <= qHi)
+        return segmentTree[stIndex];
 
-    if(start>=x && y>=end)
-    {
-    	return tree[index];
-    }
-
-    int mid =(start+end)/2;
-
-    return max(query(2*index+1,start,mid),query(2*index+2,mid+1,end));
-
+    int mid = (cLo + cHi) / 2;
+    long long left = query(qLo, qHi, cLo, mid, stIndex * 2 + 1);
+    long long right = query(qLo, qHi, mid + 1, cHi, stIndex * 2 + 2);
+    return left + right;
 }
 
-ll update(int index,int start,int end,int val)
+int segSize;
+
+void constructSegmentTree(int size)
 {
-    
-    if(lazy[index]!=0)
+    int height = (int) ceil(log((double) size) / log((double) 2));
+    segSize = (int) ceil(pow((double) 2, height + 1));
+    segmentTree = new long long[segSize];
+    lazy = new long long[segSize];
+    for (int i = 0; i < segSize; ++i)
     {
-       tree[index]+=lazy[index];
-
-       if(start!=end)
-       {
-       	  lazy[2*index+2]+=lazy[index];
-       	  lazy[2*index+1]+=lazy[index];
-       }
-
-       lazy[index]=0;
+        segmentTree[i] = 0;
+        lazy[i] = 0;
     }
-
-	if(start>y || end<x)
-	{
-		return INT_MIN;
-	}
-
-    if(start>=x && end<=y)
-    {
-    	tree[index]+=val;
-
-    	if(start!=end)
-    	{
-           lazy[2*index+1]+=val;
-           lazy[2*index+2]+=val;
-    	}
-
-       return tree[index];
-
-    }
-
-    int mid = (start+end)/2;
-
-    ll zz = update(2*index+1,start,mid,val);
-    ll yy = update(2*index+2,mid+1,end,val);
-    tree[index]=max(yy,zz);
-    return tree[index];
-
 }
 
 int main()
 {
-	cin >> n;
-
-    for(int i=0;i<n;i++)
+    int nCases;
+    scanf("%d", &nCases);
+    while (nCases--)
     {
-    	cin >> arr[i];
+        int N, C;
+        scanf("%d %d", &N, &C);
+        constructSegmentTree(N);
+        for (int i = 0; i < C; ++i)
+        {
+            int type, p, q;
+            long long v;
+            scanf("%d", &type);
+            if (type == 0)
+            {
+                scanf("%d %d %lld", &p, &q, &v);
+                update(p - 1, q - 1, 0, N - 1, 0, v);
+            }
+            else
+            {
+                scanf("%d %d", &p, &q);
+                printf("%lld\n", query(p - 1, q - 1, 0, N - 1, 0));
+            }
+        }
+        delete(segmentTree);
+        delete(lazy);
     }
-
-    build(0,0,n-1);
-
-    cout<<"ENTER NUMBER OF QUERIES"<<endl;
-    cin >> q;
-
-    while(q--)
-    {
-    	cin >> x >> y;
-    	cout<<query(0,0,n-1)<<endl;
-    }
-    
-    cout<<"ENTER AN INDEX TO UPDATE THE TREE"<<endl;
-
-    cin >> x >> y >> value;
-    update(0,0,n-1,value);
-
-    cout<<"ENTER A QUERY TO PRINT THE ANSWER"<<endl;
-    cin >> x >> y;
-    cout<<query(0,0,n-1)<<endl;
-
-	return 0;
 }
