@@ -1,123 +1,96 @@
-#include <stdio.h>
-#include <math.h> 
+//AUTHOR : Sarang ShrivastAava
 
-long long *segmentTree;
-long long *lazy;
+#include<bits/stdc++.h>
+#define ll long long int 
+#define llu unsigned long long int
+#define mod 1000000007
+#define in1(x) scanf("%lld",&x)
+#define in2(x,y) scanf("%lld%lld",&x,&y)
+#define in3(x,y,z) scanf("%lld%lld%lld",&x,&y,&z)
+using namespace std;
 
-long long query(int qLo, int qHi, int cLo, int cHi, int stIndex);
+ll n;
 
-void update(int qLo, int qHi, int cLo, int cHi, int stIndex, long long val)
-{
-    if (cHi < qLo || qHi < cLo)
-        return;
+ll update(ll tree[],ll helper[],ll i,ll j,ll val,ll l,ll r,ll node){
 
-    if (lazy[stIndex] != 0)
+    if(helper[node]!=0)
     {
-        if (cLo == cHi)
+        tree[node]+=(helper[node]*(j-i+1));
+
+        if(i!=j)
         {
-            segmentTree[stIndex] += lazy[stIndex];
+            helper[2*node]+=helper[node];
+            helper[2*node+1]+=helper[node];
         }
-        else
-        {
-            segmentTree[stIndex] += lazy[stIndex]*(cHi - cLo + 1);
-            lazy[stIndex * 2 + 1] += lazy[stIndex];
-            lazy[stIndex * 2 + 2] += lazy[stIndex];
-        }
-        lazy[stIndex] = 0;
+
+        helper[node]=0;
     }
 
-    if (qLo <= cLo && cHi <= qHi)
+    if(i>r||j<l)
+        return tree[node];
+
+    if(i>=l&&j<=r)
     {
-        if (cLo == cHi)
+        tree[node]+=(val*(j-i+1));
+        if(i!=j)
         {
-            segmentTree[stIndex] += val;
+            
+            helper[2*node]+=val;
+            helper[2*node+1]+=val;
         }
-        else
-        {
-            segmentTree[stIndex] += val * (cHi - cLo + 1);
-            lazy[stIndex * 2 + 1] += val;
-            lazy[stIndex * 2 + 2] += val;
-        }
-        return;
+
+        return tree[node];
     }
 
-    int mid = (cLo + cHi) / 2;
-    update(qLo, qHi, cLo, mid, stIndex * 2 + 1, val);
-    update(qLo, qHi, mid + 1, cHi, stIndex * 2 + 2, val);
-    int left = stIndex * 2 + 1;
-    int right = left + 1;
-    segmentTree[stIndex] = query(cLo, mid, cLo, mid, stIndex * 2 + 1) + query(mid + 1, cHi, mid + 1, cHi, stIndex * 2 + 2);
+    ll mid=(i+j)/2;
+    tree[node]=(update(tree,helper,i,mid,val,l,r,node<<1)+update(tree,helper,mid+1,j,val,l,r,(node<<1)+1));
+    return tree[node];
 }
 
-long long query(int qLo, int qHi, int cLo, int cHi, int stIndex)
+ll query(ll tree[],ll helper[],ll i,ll j,ll node,ll l,ll r)
 {
-    if (cHi < qLo || qHi < cLo)return 0;
-
-    if (lazy[stIndex] != 0)
+    
+    if(i>r||j<l)
+        return 0;
+    if(helper[node]!=0)
     {
-        if (cLo == cHi)
+        tree[node]+=(helper[node]*(j-i+1));
+        if(i!=j)
         {
-            segmentTree[stIndex] += lazy[stIndex];
+            helper[2*node]+=helper[node];
+            helper[2*node+1]+=helper[node];
         }
-        else
-        {
-            segmentTree[stIndex] += lazy[stIndex]*(cHi - cLo + 1);
-            lazy[stIndex * 2 + 1] += lazy[stIndex];
-            lazy[stIndex * 2 + 2] += lazy[stIndex];
-        }
-
-        lazy[stIndex] = 0;
+        helper[node]=0;
     }
-    if (qLo <= cLo && cHi <= qHi)
-        return segmentTree[stIndex];
-
-    int mid = (cLo + cHi) / 2;
-    long long left = query(qLo, qHi, cLo, mid, stIndex * 2 + 1);
-    long long right = query(qLo, qHi, mid + 1, cHi, stIndex * 2 + 2);
-    return left + right;
-}
-
-int segSize;
-
-void constructSegmentTree(int size)
-{
-    int height = (int) ceil(log((double) size) / log((double) 2));
-    segSize = (int) ceil(pow((double) 2, height + 1));
-    segmentTree = new long long[segSize];
-    lazy = new long long[segSize];
-    for (int i = 0; i < segSize; ++i)
-    {
-        segmentTree[i] = 0;
-        lazy[i] = 0;
-    }
+    if(i>=l&&j<=r)return tree[node];
+    ll mid=(i+j)>>1;
+    return (query(tree,helper,i,mid,node<<1,l,r)+query(tree,helper,mid+1,j,(node<<1)+1,l,r));
 }
 
 int main()
 {
-    int nCases;
-    scanf("%d", &nCases);
-    while (nCases--)
+    ll t,l,r,c,i,p,s,j;
+    in1(t);
+    while(t--)
     {
-        int N, C;
-        scanf("%d %d", &N, &C);
-        constructSegmentTree(N);
-        for (int i = 0; i < C; ++i)
+        ll tree[300000]={0},helper[300000]={0};
+        scanf("%lld%lld",&n,&c);
+        for(i=0;i<c;i++)
         {
-            int type, p, q;
-            long long v;
-            scanf("%d", &type);
-            if (type == 0)
-            {
-                scanf("%d %d %lld", &p, &q, &v);
-                update(p - 1, q - 1, 0, N - 1, 0, v);
+            in1(p);
+            if(p==0)
+            {       
+                in3(l,r,s);
+                update(tree,helper,1,n,s,l,r,1);
             }
             else
             {
-                scanf("%d %d", &p, &q);
-                printf("%lld\n", query(p - 1, q - 1, 0, N - 1, 0));
+           
+                in2(l,r);
+                printf("%lld\n",query(tree,helper,1,n,1,l,r));
             }
         }
-        delete(segmentTree);
-        delete(lazy);
+        
     }
+    return 0;
 }
