@@ -1,62 +1,45 @@
 #include<bits/stdc++.h>
-#define maxi 1000005
 using namespace std;
 
 typedef long long ll;
 
-ll t,n,arr[maxi];
-
 multiset<ll> s;
+
+ll n,a;
 
 int main()
 {
-	cin >>t;
-	while(t--)
-	{
-		s.clear();
-		cin >> 	n;
-		for(int i=0;i<n;i++)
-		{
-			cin >> arr[i];
-		
-		}
+    cin >> n;
+    for(int i=0;i<n;i++)
+    {
+        cin >> a;
+        s.insert(a);
+    }
 
-        s.insert(arr[0]);
+    // to delete just one occurence use s.find
 
-        for(int i=1;i<n;i++)
-        {
-        	auto it = s.upper_bound(arr[i]);
-        	if(it==s.end())
-        	{
-        		s.insert(arr[i]);
-        	}
-        	else
-        		{
-        			typedef multiset< ll > :: iterator It;
-        			pair<It,It> pit =s.equal_range(*it);
-       
-                    if( distance( pit.first, pit.second ) >= 2 )
-                     {
-                         s.erase( pit.first );
-                         s.insert(arr[i]);
-                     }
-                     else
-                     {
-                     	s.erase(*it);
-                     	s.insert(arr[i]);
-                     }
-        			
-                    
-        		}
-        }
 
-        cout<<s.size()<<" ";
-        for(auto ii= s.begin();ii!=s.end();ii++)
-        {
-        	cout<<*ii<<" ";
-        }
-        cout<<endl;
+    cout<<"ENTER THE NUMBE OF DELETIONS YOU WANT TO HAve"<<endl;
+   ll m;
 
-	}
-	return 0;
+    cin >> m;
+
+
+    for(int i=0;i<m;i++)
+    {
+        cin >> a;
+        if(s.find(a)!=s.end())
+        s.erase(s.find(a));
+        else
+        cout<<"NUMBER DOESN'T EXIST"<<endl;
+    } 
+
+    for(auto ii = s.begin();ii!=s.end();ii++)
+    {
+        cout<<*ii<<" ";
+    }
+    cout<<endl;
+
+
+    return 0;
 }

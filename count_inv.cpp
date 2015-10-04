@@ -28,7 +28,8 @@ ll update(int idx,int value)
 
 int main()
 {
- 	cin >> n;
+ 	  cin >> n;
+    
     for(int i=1;i<=n;i++)
     {
     	cin >> arr[i];
